@@ -49,7 +49,7 @@ stages:
               artifactName: "$(FunctionsPackageName)"
               targetPath: "$(Build.ArtifactStagingDirectory)/$(FunctionsPackageName)"
   - stage: deploy
-    displayName: "Deploy Function App"      
+    displayName: "Deploy Function App"  
     condition: succeeded()
     variables: 
       - name: ResourceGroupName
@@ -61,8 +61,7 @@ stages:
     jobs:
       - deployment: deploy_functions_binaries
         displayName: "Deploy Functions"
-        dependsOn:
-          - deploy_arm_templates_infrastructure
+        environment: "BackEndChallenge-Dev"    
         strategy:
           runOnce:
             deploy:
