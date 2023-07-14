@@ -2,75 +2,92 @@
 # Build a .NET Core function app and deploy it to Azure as a Windows function App.
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/en-us/azure/devops/pipelines/languages/dotnet-core
-
-trigger:
-- master
-
 variables:
   # Azure Resource Manager connection created during pipeline creation
   azureSubscription: '79573c34-3a9c-4a48-8707-22f6f0cc157e'
+  NUGET_XMLDOC_MODE: skip
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  FunctionsPackageName: functions-package
+  WebApiPackageName: webapi-package
+  IntegrationTestPackageName: integrationtest-package
 
-  # Function app name
-  functionAppName: 'CustomerAppFunction'
+trigger:
+  - master
 
-  # Agent VM image name
-  vmImageName: 'windows-2019'
-
-  # Working Directory
-  workingDirectory: 'azChallengeFA-Customer'
+pool:
+  name: "Azure Pipelines"
+  vmImage: "windows-latest"
 
 stages:
-- stage: Build
-  displayName: Build stage
-
-  jobs:
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: $(vmImageName)
-
-    steps:
-    - task: DotNetCoreCLI@2
-      displayName: Build
-      inputs:
-        command: 'build'
-        projects: |
-          $(workingDirectory)/*.csproj
-        arguments: --output $(System.DefaultWorkingDirectory)/publish_output --configuration Release
-
-    - task: ArchiveFiles@2
-      displayName: 'Archive files'
-      inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/publish_output'
-        includeRootFolder: false
-        archiveType: zip
-        archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-        replaceExistingArchive: true
-
-    - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-      artifact: drop
-
-- stage: Deploy
-  displayName: Deploy stage
-  dependsOn: Build
-  condition: succeeded()
-
-  jobs:
-  - deployment: Deploy
-    displayName: Deploy
-    environment: 'development'
-    pool:
-      vmImage: $(vmImageName)
-
-    strategy:
-      runOnce:
-        deploy:
-
-          steps:
-          - task: AzureFunctionApp@1
-            displayName: 'Azure functions app deploy'
+  - stage: build
+    displayName:  Build
+    variables:
+      - name: ResourceGroupName
+        value: az-backendchallengetest0-rg
+      - name: Location
+        value: Australia Southeast 
+      - name: DeploymentServiceConnectionName
+        value: BackEndChallenge-SVC
+    jobs:
+      - job: build_functionApp
+        displayName: Build Function App
+        steps:
+          - task: UseDotNet@2
+            displayName: "Use .NET 6"
             inputs:
-              azureSubscription: '$(azureSubscription)'
-              appType: functionApp
-              appName: $(functionAppName)
-              package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
+              version: "6.0.x"
+          - task: DotNetCoreCLI@2
+            displayName: "Publish Function Package"
+            inputs:
+              command: "publish"
+              projects: "$(Build.SourcesDirectory)/azChallengeFA-Customer/CustomerAppFunction.csproj"
+              arguments: "--configuration Release --output $(Build.ArtifactStagingDirectory)/$(FunctionsPackageName)"
+              publishWebProjects: false
+          - task: PublishPipelineArtifact@0
+            displayName: "Publish Artifact: $(FunctionsPackageName)"
+            inputs:
+              artifactName: "$(FunctionsPackageName)"
+              targetPath: "$(Build.ArtifactStagingDirectory)/$(FunctionsPackageName)"
+  - stage: deploy
+    displayName: "Deploy Function App"      
+    condition: succeeded()
+    variables: 
+      - name: ResourceGroupName
+        value: az-backendchallengetest0-rg
+      - name: Location
+        value: Australia Southeast 
+      - name: DeploymentServiceConnectionName
+        value: BackEndChallenge-SVC
+    dependsOn: build
+    jobs:
+      - deployment: deploy_functions_binaries
+        displayName: "Deploy Functions"
+        environment: "P02516-IRG-ServiceConnectionsApi-DEV"
+        dependsOn:
+          - deploy_arm_templates_infrastructure
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: DownloadPipelineArtifact@0
+                  displayName: "Download Artifact: $(FunctionsPackageName)"
+                  inputs:
+                    artifactName: "$(FunctionsPackageName)"
+                    targetPath: $(System.DefaultWorkingDirectory)/$(FunctionsPackageName)
+
+                - task: "ARM Outputs@5"
+                  displayName: "Fetch ARM Outputs"
+                  inputs:
+                    ConnectedServiceNameARM: "${{ variables.DeploymentServiceConnectionName }}"
+                    resourceGroupName: "$(ResourceGroupName)"
+                    prefix: "ARMOutputs."
+
+                - task: AzureFunctionApp@2
+                  displayName: "Azure Function App Deploy: $(ARMOutputs.functionAppName)"
+                  inputs:
+                    azureSubscription: "${{ variables.DeploymentServiceConnectionName }}"
+                    appType: functionApp
+                    appName: "$(ARMOutputs.functionAppName)"
+                    package: "$(System.DefaultWorkingDirectory)/$(FunctionsPackageName)/CustomerAppFunction.zip"
+                    deploymentMode: runFromPackage
+                    runtimeStack: 'DOTNET|6.0' 
