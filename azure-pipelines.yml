@@ -81,11 +81,11 @@ stages:
                     whenLastDeploymentIsFailed: 'fail'
 
                 - task: AzureFunctionApp@2
-                  displayName: "Azure Function App Deploy: $(ARMOutputs.functionAppName)"
+                  displayName: "Azure Function App Deploy: CustomerAppFunction"
                   inputs:
                     azureSubscription: "${{ variables.DeploymentServiceConnectionName }}"
                     appType: functionApp
-                    appName: "$(ARMOutputs.functionAppName)"
+                    appName: "CustomerAppFunction"
                     package: "$(System.DefaultWorkingDirectory)/$(FunctionsPackageName)/CustomerAppFunction.zip"
                     deploymentMode: runFromPackage
                     runtimeStack: 'DOTNET|6.0' 
