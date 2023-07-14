@@ -139,6 +139,6 @@ stages:
                     azureSubscription: "${{ variables.DeploymentServiceConnectionName }}"
                     appType: functionApp
                     appName: "$(ARMOutputs.functionAppName)"
-                    package: "$(System.DefaultWorkingDirectory)/$(FunctionsPackageName)/CustomerAppFunction.zip"
+                    package: "$(System.DefaultWorkingDirectory)/$(FunctionsPackageName)/azChallengeFA-Customer.zip"
                     deploymentMode: runFromPackage
                     runtimeStack: 'DOTNET|6.0' 
