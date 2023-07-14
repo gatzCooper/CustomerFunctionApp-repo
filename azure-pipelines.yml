@@ -58,11 +58,9 @@ stages:
         value: Australia Southeast 
       - name: DeploymentServiceConnectionName
         value: BackEndChallenge-SVC
-    dependsOn: build
     jobs:
       - deployment: deploy_functions_binaries
         displayName: "Deploy Functions"
-        environment: "P02516-IRG-ServiceConnectionsApi-DEV"
         dependsOn:
           - deploy_arm_templates_infrastructure
         strategy:
