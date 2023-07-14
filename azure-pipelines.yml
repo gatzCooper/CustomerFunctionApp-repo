@@ -72,20 +72,19 @@ stages:
                     artifactName: "$(FunctionsPackageName)"
                     targetPath: $(System.DefaultWorkingDirectory)/$(FunctionsPackageName)
 
-                - task: ARM Outputs@6
+                - task: ARM Outputs@5
                   displayName: "Fetch ARM Outputs"
                   inputs:
                     ConnectedServiceNameARM:  "${{ variables.DeploymentServiceConnectionName }}"
                     resourceGroupName: "$(ResourceGroupName)"
                     prefix: "ARMOutputs."
-                    whenLastDeploymentIsFailed: 'fail'
 
                 - task: AzureFunctionApp@2
-                  displayName: "Azure Function App Deploy: CustomerAppFunction"
+                  displayName: "Azure Function App Deploy: $(ARMOutputs.functionAppName)"
                   inputs:
                     azureSubscription: "${{ variables.DeploymentServiceConnectionName }}"
                     appType: functionApp
-                    appName: "CustomerAppFunction"
+                    appName: "$(ARMOutputs.functionAppName)"
                     package: "$(System.DefaultWorkingDirectory)/$(FunctionsPackageName)/CustomerAppFunction.zip"
                     deploymentMode: runFromPackage
                     runtimeStack: 'DOTNET|6.0' 
