@@ -48,6 +48,36 @@ stages:
             inputs:
               artifactName: "$(FunctionsPackageName)"
               targetPath: "$(Build.ArtifactStagingDirectory)/$(FunctionsPackageName)"
+      - job: build_arm_template
+        displayName: Build the ARM Templates
+        steps:
+          - task: CopyFiles@2
+            displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)\arm-template'
+            inputs:
+              SourceFolder: CustomerFunctionApp.Deployment
+              Contents: '**\*.json'
+              TargetFolder: '$(Build.ArtifactStagingDirectory)\arm-template'
+          - task: Npm@1
+            displayName: "Install JSON Lint"
+            inputs:
+              command: custom
+              customCommand: "install jsonlint -g"
+          - script: "jsonlint $(Build.ArtifactStagingDirectory)/arm-template/infrastructure.json"
+            displayName: "Validate ARM Template JSON Schema"
+          - task: AzureResourceGroupDeployment@2
+            displayName: "Validate ARM Template Deployment: Infrastructure"
+            inputs:
+              azureSubscription: "${{ variables.DeploymentServiceConnectionName }}"
+              resourceGroupName: $(ResourceGroupName)
+              location: $(Location)
+              csmFile: "$(Build.ArtifactStagingDirectory)/arm-template/infrastructure.json"
+              csmParametersFile: "$(Build.ArtifactStagingDirectory)/arm-template/azuredeploy.parameters.json"
+              deploymentMode: "Validation"
+          - task: PublishPipelineArtifact@1
+            displayName: "Publish Pipeline Artifact"
+            inputs:
+              targetPath: '$(Build.ArtifactStagingDirectory)\arm-template'
+              artifact: "arm-template"
   - stage: deploy
     displayName: "Deploy Function App"  
     condition: succeeded()
@@ -72,7 +102,7 @@ stages:
                     artifactName: "$(FunctionsPackageName)"
                     targetPath: $(System.DefaultWorkingDirectory)/$(FunctionsPackageName)
 
-                - task: ARM Outputs@5
+                - task: ARM Outputs@6
                   displayName: "Fetch ARM Outputs"
                   inputs:
                     ConnectedServiceNameARM:  "${{ variables.DeploymentServiceConnectionName }}"
