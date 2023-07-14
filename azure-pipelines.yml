@@ -91,7 +91,7 @@ stages:
     jobs:
       - deployment: deploy_arm_templates_infrastructure
         displayName: "Deploy ARM Templates: Infrastructure"
-        environment: "P02516-IRG-ServiceConnectionsApi-DEV"
+        environment: "BackEndChallenge-Dev"
         strategy:
           runOnce:
             deploy:
@@ -113,7 +113,9 @@ stages:
                     deploymentMode: Incremental
       - deployment: deploy_functions_binaries
         displayName: "Deploy Functions"
-        environment: "BackEndChallenge-Dev"    
+        environment: "BackEndChallenge-Dev" 
+        dependsOn:
+          - deploy_arm_templates_infrastructure   
         strategy:
           runOnce:
             deploy:
