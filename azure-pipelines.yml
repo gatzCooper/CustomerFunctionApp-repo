@@ -73,11 +73,11 @@ stages:
                     targetPath: $(System.DefaultWorkingDirectory)/$(FunctionsPackageName)
 
                 - task: ARM Outputs@6
+                  displayName: "Fetch ARM Outputs"
                   inputs:
-                    ConnectedServiceNameSelector: 'ConnectedServiceNameARM'
-                    ConnectedServiceNameARM: 'Az-Mond-Sub (d0f3efe5-ca3a-4b28-95e9-77938c894788)'
-                    resourceGroupName: 'az-backendchallengetest0-rg'
-                    prefix: 'ARMoutputs.'
+                    ConnectedServiceNameARM:  "${{ variables.DeploymentServiceConnectionName }}"
+                    resourceGroupName: "$(ResourceGroupName)"
+                    prefix: "ARMOutputs."
                     whenLastDeploymentIsFailed: 'fail'
 
                 - task: AzureFunctionApp@2
