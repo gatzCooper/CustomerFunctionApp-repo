@@ -54,7 +54,7 @@ namespace azChallengeFA_Customer
             {
                 var configuration = serviceProvider.GetRequiredService<IConfiguration>();
                 //var cosmosDbConnectionString = configuration["azNoSqlConnectionString"];
-                var cosmosDbConnectionString = configuration["CosmosDbConnectionString"];
+                var cosmosDbConnectionString = configuration["azNoSqlConnectionString"];
 
                 var cosmosClientBuilder = new CosmosClientBuilder(cosmosDbConnectionString);
                 return cosmosClientBuilder
