@@ -53,7 +53,6 @@ namespace azChallengeFA_Customer
             services.AddSingleton(serviceProvider =>
             {
                 var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-                //var cosmosDbConnectionString = configuration["azNoSqlConnectionString"];
                 var cosmosDbConnectionString = configuration["azNoSqlConnectionString"];
 
                 var cosmosClientBuilder = new CosmosClientBuilder(cosmosDbConnectionString);
