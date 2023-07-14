@@ -89,6 +89,28 @@ stages:
       - name: DeploymentServiceConnectionName
         value: BackEndChallenge-SVC
     jobs:
+      - deployment: deploy_arm_templates_infrastructure
+        displayName: "Deploy ARM Templates: Infrastructure"
+        environment: "P02516-IRG-ServiceConnectionsApi-DEV"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: DownloadPipelineArtifact@0
+                  displayName: "Download Artifact: arm-template"
+                  inputs:
+                    artifactName: "arm-template"
+                    targetPath: $(System.DefaultWorkingDirectory)/arm-template
+
+                - task: AzureResourceGroupDeployment@2
+                  displayName: "ARM template deployment"
+                  inputs:
+                    azureSubscription: "${{ variables.DeploymentServiceConnectionName }}"
+                    resourceGroupName: $(ResourceGroupName)
+                    location: $(Location)
+                    csmFile: "$(System.DefaultWorkingDirectory)/arm-template/infrastructure.json"
+                    csmParametersFile: "$(System.DefaultWorkingDirectory)/arm-template/azuredeploy.parameters.json"
+                    deploymentMode: Incremental
       - deployment: deploy_functions_binaries
         displayName: "Deploy Functions"
         environment: "BackEndChallenge-Dev"    
