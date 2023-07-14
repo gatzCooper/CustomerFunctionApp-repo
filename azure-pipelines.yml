@@ -7,7 +7,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  azureSubscription: 'Az-Mond-Sub'
+  azureSubscription: 'BackEndChallenge-SVC'
   appName: 'CustomerAppFunction'
   resourceGroupName: 'az-backendchallengetest0-rg'
   location: 'Australia Southeast'
