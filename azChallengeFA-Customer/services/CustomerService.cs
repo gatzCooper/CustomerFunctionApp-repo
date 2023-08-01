@@ -28,5 +28,6 @@ namespace azChallengeFA_Customer.services
             var container = _cosmosClient.GetContainer(_cosmosDbDatabaseName, _cosmosDbContainerName);
             await container.CreateItemAsync(customer);
         }
+
     }
 }
