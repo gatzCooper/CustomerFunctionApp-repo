@@ -5,6 +5,18 @@ VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomerAppFunction", "azChallengeFA-Customer\CustomerAppFunction.csproj", "{8204601D-4410-4AC1-AE05-40C679ED2E1F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1. Deployment", "1. Deployment", "{6190B816-A58C-496B-9533-C335422AED36}"
+	ProjectSection(SolutionItems) = preProject
+		Deployment\azuredeploy.json = Deployment\azuredeploy.json
+		Deployment\azuredeploy.parameters.json = Deployment\azuredeploy.parameters.json
+		Deployment\Deployment.deployproj = Deployment\Deployment.deployproj
+		Deployment\Deployment.targets = Deployment\Deployment.targets
+		Deployment\infrastructure copy.json = Deployment\infrastructure copy.json
+		Deployment\infrastructure.json = Deployment\infrastructure.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2. Src", "2. Src", "{BC653080-7DA3-4AEC-886D-53D8BAAACA1E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,6 +30,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8204601D-4410-4AC1-AE05-40C679ED2E1F} = {BC653080-7DA3-4AEC-886D-53D8BAAACA1E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C9AC0112-BE08-473C-BBD1-1175D15598D3}

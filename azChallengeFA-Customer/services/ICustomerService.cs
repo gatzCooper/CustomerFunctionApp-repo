@@ -10,5 +10,6 @@ namespace azChallengeFA_Customer.services
     public interface ICustomerService
     {
         Task SaveCustomerToCosmosDbAsync(CustomerInfo customer);
+        Task PublishEventAsync(dynamic data);
     }
 }
