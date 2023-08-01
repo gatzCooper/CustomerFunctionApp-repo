@@ -5,7 +5,7 @@
 
     "variables": {
 
-      "functionAppName": "azChallengeFA-Customer" 
+      "functionAppName": "CustomerAppFunction" 
     },
    
     "outputs": {
