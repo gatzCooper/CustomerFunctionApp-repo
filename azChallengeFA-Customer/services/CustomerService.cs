@@ -16,11 +16,11 @@ namespace azChallengeFA_Customer.services
         private readonly string _cosmosDbContainerName;
         private readonly ILogger<CustomerService> _logger;
         private readonly CosmosClient _cosmosClient;
-        public CustomerService(ILogger<CustomerService> logger, CosmosClient cosmosClient)
+        public CustomerService(ILogger<CustomerService> logger, CosmosClient cosmosClient, IConfiguration config)
         {
             _logger = logger;
-            _cosmosDbDatabaseName = "CustomerDB";
-            _cosmosDbContainerName = "Customer";
+            _cosmosDbDatabaseName = config["CosmosDbDatabaseName"];
+            _cosmosDbContainerName = config["CosmosDbContainerName"];
             _cosmosClient = cosmosClient;
         }
         public async Task SaveCustomerToCosmosDbAsync(CustomerInfo customer)

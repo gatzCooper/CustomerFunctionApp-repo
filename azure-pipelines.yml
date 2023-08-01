@@ -25,7 +25,7 @@ stages:
       - name: ResourceGroupName
         value: az-backendchallengetest0-rg
       - name: Location
-        value: Australia Southeast 
+        value: Southeast Asia 
       - name: DeploymentServiceConnectionName
         value: BackEndChallenge-SVC
     jobs:
@@ -54,7 +54,7 @@ stages:
           - task: CopyFiles@2
             displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)\arm-template'
             inputs:
-              SourceFolder: CustomerFunctionApp.Deployment
+              SourceFolder: Deployment
               Contents: '**\*.json'
               TargetFolder: '$(Build.ArtifactStagingDirectory)\arm-template'
           - task: Npm@1
