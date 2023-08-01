@@ -35,7 +35,11 @@ stages:
           - task: UseDotNet@2
             displayName: "Use .NET 6"
             inputs:
-              version: "6.0.x"
+              version: "6.0.x"           
+
+          - script: dotnet tool update -g Azure.Functions.Cli
+            displayName: 'Update Azure Functions Core Tools'
+            
           - task: DotNetCoreCLI@2
             displayName: "Publish Function Package"
             inputs:
@@ -132,14 +136,6 @@ stages:
                     ConnectedServiceNameARM:  "${{ variables.DeploymentServiceConnectionName }}"
                     resourceGroupName: "$(ResourceGroupName)"
                     prefix: "ARMOutputs."
-
-                - task: UseDotNet@2
-                  displayName: 'Use .NET Core sdk'
-                  inputs:
-                    version: '6.x'  # Use the latest version of .NET Core 6.x
-              
-                - script: dotnet tool update -g Azure.Functions.Cli
-                  displayName: 'Update Azure Functions Core Tools'
 
                 - task: AzureFunctionApp@2
                   displayName: "Azure Function App Deploy: $(ARMOutputs.functionAppName)"
