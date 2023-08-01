@@ -35,11 +35,7 @@ stages:
           - task: UseDotNet@2
             displayName: "Use .NET 6"
             inputs:
-              version: "6.0.x"           
-
-          - script: dotnet tool update -g Azure.Functions.Cli
-            displayName: 'Update Azure Functions Core Tools'
-            
+              version: "6.0.x"
           - task: DotNetCoreCLI@2
             displayName: "Publish Function Package"
             inputs:
@@ -89,7 +85,7 @@ stages:
       - name: ResourceGroupName
         value: az-backendchallengetest0-rg
       - name: Location
-        value: Australia Southeast 
+        value: Southeast Asia
       - name: DeploymentServiceConnectionName
         value: BackEndChallenge-SVC
     jobs:
