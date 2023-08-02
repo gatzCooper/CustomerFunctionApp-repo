@@ -18,47 +18,31 @@ namespace azChallengeFA_Customer.services
         private readonly string _cosmosDbContainerName;
         private readonly ILogger<CustomerService> _logger;
         private readonly CosmosClient _cosmosClient;
-        private readonly string _eventGridTopicEndpoint;
-        private readonly string _eventGridTopicKey;
-
-
-     
         public CustomerService(ILogger<CustomerService> logger, CosmosClient cosmosClient, IConfiguration config)
         {
             _logger = logger;
             _cosmosDbDatabaseName = config["CosmosDbDatabaseName"];
             _cosmosDbContainerName = config["CosmosDbContainerName"];
             _cosmosClient = cosmosClient;
-            _eventGridTopicEndpoint = config["EventGridTopicEndpoint"];
-            _eventGridTopicKey = config["EventGridTopicKey"];
-
         }
         public async Task SaveCustomerToCosmosDbAsync(CustomerInfo customer)
         {
+            var cust = new CustomerInfo
+            {
+                Id = Guid.NewGuid(),
+                FirstName = customer.FirstName,
+                LastName = customer.LastName,
+                BirthdayInEpoch = customer.BirthdayInEpoch,
+                Email = customer.Email
+            };
             var container = _cosmosClient.GetContainer(_cosmosDbDatabaseName, _cosmosDbContainerName);
-            await container.CreateItemAsync(customer);
+            await container.CreateItemAsync(cust);
         }
 
-        public async Task PublishEventAsync(dynamic data)
+        public async Task UpsertCustomerDataAsync(CustomerInfo  customer)
         {
-             TopicCredentials topicCredentials = new TopicCredentials(_eventGridTopicKey);
-             EventGridClient eventGridClient = new EventGridClient(topicCredentials);
-             var topicHostname = new Uri(_eventGridTopicEndpoint).Host;
-
-            var eventGridEvents = new List<EventGridEvent>
-        {
-            new EventGridEvent
-            {
-                Id = Guid.NewGuid().ToString(),
-                EventType = "DataChangeEvent",
-                DataVersion = "1.0",
-                Subject = "DataChange",
-                Data = data,
-                EventTime = DateTime.UtcNow
-            }
-        };
-
-            await eventGridClient.PublishEventsAsync(topicHostname, eventGridEvents);
+            var container =_cosmosClient.GetContainer(_cosmosDbDatabaseName, _cosmosDbContainerName);
+            await container.UpsertItemAsync(customer, new PartitionKey(customer.Id.ToString()));
         }
 
     }

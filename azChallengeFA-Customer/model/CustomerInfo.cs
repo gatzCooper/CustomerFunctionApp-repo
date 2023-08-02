@@ -8,7 +8,7 @@ namespace azChallengeFA_Customer.model
 {
     public class CustomerInfo
     {
-        public Guid id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public long BirthdayInEpoch { get; set; }
